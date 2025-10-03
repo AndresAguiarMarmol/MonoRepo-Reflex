@@ -9,9 +9,24 @@ def formulario_registro():
     return rx.vstack(
         rx.heading("Registro de Usuario", size="5"),
         rx.input(
+            placeholder="Cedula de Identidad o RUT",
+            on_change=RegistroState.set_rut,
+            value=RegistroState.rut
+        ),
+        rx.input(
             placeholder="Nombre",
             on_change=RegistroState.set_nombre,
             value=RegistroState.nombre
+        ),
+        rx.input(
+            placeholder="Apellido",
+            on_change=RegistroState.set_apellido,
+            value=RegistroState.apellido
+        ),
+        rx.input(
+            placeholder="Telefono",
+            on_change=RegistroState.set_telefono,
+            value=RegistroState.telefono
         ),
         rx.input(
             placeholder="Email",

@@ -2,28 +2,36 @@
 
 import sqlite3
 
-DB_NAME = "agenda.db"
+DB_NAME = "basedatos.db"
 
 def conectar():
     return sqlite3.connect(DB_NAME)
 
+import sqlite3
+
 def crear_tablas():
     conn = conectar()
+    conn = sqlite3.connect("basedatos.db")
     cursor = conn.cursor()
 
-    # Tabla usuarios
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS usuarios (
+    CREATE TABLE IF NOT EXISTS pacientes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        rol TEXT NOT NULL,
-        activo INTEGER DEFAULT 1
+        rut TEXT UNIQUE NOT NULL,
+        telefono TEXT,
+        correo TEXT
     )
     """)
 
-    # Tabla citas
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS medicos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        especialidad TEXT
+    )
+    """)
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS citas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,11 +40,39 @@ def crear_tablas():
         fecha TEXT NOT NULL,
         hora TEXT NOT NULL,
         motivo TEXT,
-        estado TEXT DEFAULT 'pendiente',
-        FOREIGN KEY(paciente_id) REFERENCES usuarios(id),
-        FOREIGN KEY(medico_id) REFERENCES usuarios(id)
+        FOREIGN KEY (paciente_id) REFERENCES pacientes(id),
+        FOREIGN KEY (medico_id) REFERENCES medicos(id)
     )
     """)
 
+def registrar_paciente(nombre, rut, telefono, correo):
+        conn = sqlite3.connect("basedatos.db")
+        cursor = conn.cursor()
+        cursor.execute("""
+        INSERT INTO pacientes (nombre, rut, telefono, correo)
+        VALUES (?, ?, ?, ?)
+        """, (nombre, rut, telefono, correo))
+
+
+def obtener_id_paciente_por_rut(rut):
+    conn = sqlite3.connect("basedatos.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM pacientes WHERE rut = ?", (rut,))
+    resultado = cursor.fetchone()
+    conn.close()
+    return resultado[0] if resultado else None
+
+def registrar_cita(rut_paciente, id_medico, fecha, hora, motivo):
+    paciente_id = obtener_id_paciente_por_rut(rut_paciente)
+    if paciente_id is None:
+        print("Paciente no encontrado.")
+        return
+
+    conn = sqlite3.connect("basedatos.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO citas (paciente_id, medico_id, fecha, hora, motivo)
+        VALUES (?, ?, ?, ?, ?)
+    """, (paciente_id, id_medico, fecha, hora, motivo))
     conn.commit()
-    
+    conn.close()
