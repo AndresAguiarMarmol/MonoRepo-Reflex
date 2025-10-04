@@ -45,6 +45,23 @@ def crear_tablas():
     )
     """)
 
+def crear_usuario(nombre, email, password, rol="paciente"):
+    conn = sqlite3.connect("agenda.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO usuarios (nombre, email, password, rol)
+            VALUES (?, ?, ?, ?)
+        """, (nombre, email, password, rol))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        # Email duplicado o error de restricción
+        return False
+    finally:
+        conn.close()
+
+
 def registrar_paciente(nombre, rut, telefono, correo):
         conn = sqlite3.connect("basedatos.db")
         cursor = conn.cursor()
@@ -74,5 +91,19 @@ def registrar_cita(rut_paciente, id_medico, fecha, hora, motivo):
         INSERT INTO citas (paciente_id, medico_id, fecha, hora, motivo)
         VALUES (?, ?, ?, ?, ?)
     """, (paciente_id, id_medico, fecha, hora, motivo))
+
+def validar_login(email, password):
+    conn = sqlite3.connect("agenda.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT id, rol FROM usuarios WHERE email = ? AND password = ?
+    """, (email, password))
+    resultado = cursor.fetchone()
+    conn.close()
+    if resultado:
+        return {"id": resultado[0], "rol": resultado[1]}
+    return None
+
+
     conn.commit()
     conn.close()
