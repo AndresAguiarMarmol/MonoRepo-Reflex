@@ -6,7 +6,8 @@ class State(rx.State):
 
     def fetch_usuarios(self):
         yield rx.get(
-            "http://127.0.0.1:8000/usuarios/",
+            "http://127.0.0.1:8000"
+            "/usuarios/",
             callback=lambda data: setattr(self, "usuarios", str(data))
         )
 
@@ -22,4 +23,4 @@ def index():
 # Configuración de la app Reflex
 app = rx.App()
 app.add_page(index)
-app.compile()
+
