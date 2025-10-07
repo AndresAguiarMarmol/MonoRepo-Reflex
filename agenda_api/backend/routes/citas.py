@@ -1,22 +1,19 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import SessionLocal
-from schemas import CitaCreate
-from crud.citas import crear_cita, listar_citas
-router = APIRouter()
+from database import get_db
+from crud import citas as crud
+from schemas import citas, CitaCreate
+from typing import List
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+router = APIRouter(prefix="/citas", tags=["Citas"])
 
-@router.post("/citas/")
-def registrar_cita(cita: CitaCreate, db: Session = Depends(get_db)):
-    return crear_cita(db, cita)
+@router.post("/", response_model=Citas)
+def crear(datos: CitasCreate, db: Session = Depends(get_db)):
+    return crud.crear_cita(db, datos)
 
-@router.get("/citas/")
-def obtener_usuarios(db: Session = Depends(get_db)):
-    return listar_citas(db)
+@router.get("/", response_model=List[Citas])
+def listar(db: Session = Depends(get_db)):
+    return crud.listar_citas(db)
+
+
 

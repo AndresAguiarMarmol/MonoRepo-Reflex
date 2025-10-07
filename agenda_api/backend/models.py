@@ -1,19 +1,22 @@
 
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from database import Base
+from db import Base
 
 class Profesion(Base):
     __tablename__ = "profesiones"
     id = Column(Integer, primary_key=True)
     nombre = Column(String, unique=True)
 
+from sqlalchemy import Column, Integer, String
+
 class Profesional(Base):
     __tablename__ = "profesionales"
-    id = Column(Integer, primary_key=True)
-    nombre = Column(String)
-    profesion_id = Column(Integer, ForeignKey("profesiones.id"))
-    profesion = relationship("Profesion")
+
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String, nullable=False)
+    especialidad = Column(String, nullable=False)
+    telefono = Column(String, nullable=True)
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -24,11 +27,17 @@ class Usuario(Base):
 
 class Cita(Base):
     __tablename__ = "citas"
-    id = Column(Integer, primary_key=True)
+
+    id = Column(Integer, primary_key=True, index=True)
+    fecha = Column(DateTime, nullable=False)
+    motivo = Column(String, nullable=True)
     usuario_id = Column(Integer, ForeignKey("usuarios.id"))
     profesional_id = Column(Integer, ForeignKey("profesionales.id"))
-    fecha = Column(String)
-    hora = Column(String)
-    lugar = Column(String)
-    descripcion = Column(Text)
+    usuario = relationship("Usuario")
+    profesional = relationship("Profesional")
+
+
+
+
+
 

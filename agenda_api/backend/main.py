@@ -4,6 +4,8 @@ from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
+from routes import profesionales
+app.include_router(profesionales.router)
 
 # Configuración de base de datos
 DATABASE_URL = "sqlite:///./medicapp.db"
@@ -19,8 +21,17 @@ class Usuario(Base):
     telefono = Column(String, unique=True)
     correo = Column(String, unique=True)
 
-class Cita(Base):
+class Citas(Base):
     __tablename__ = "citas"
+    id = Column(Integer, primary_key=True, index=True)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"))
+    fecha = Column(String)
+    hora = Column(String)
+    lugar = Column(String)
+    descripcion = Column(Text)
+
+class Profesiones(Base):
+    __tablename__ = "Profesiones"
     id = Column(Integer, primary_key=True, index=True)
     usuario_id = Column(Integer, ForeignKey("usuarios.id"))
     fecha = Column(String)
@@ -68,4 +79,11 @@ app.include_router(usuarios.router)
 app.include_router(profesionales.router)
 app.include_router(profesiones.router)
 app.include_router(citas.router)
+from routes import profesionales
+from routes import profesiones
+from routes import citas
+from routes import usuarios
+
+
+
 

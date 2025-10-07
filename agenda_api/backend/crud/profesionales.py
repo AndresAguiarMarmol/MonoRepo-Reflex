@@ -1,3 +1,4 @@
+
 from sqlalchemy.orm import Session
 from models import Profesional
 from schemas import ProfesionalCreate
@@ -11,4 +12,8 @@ def crear_profesional(db: Session, datos: ProfesionalCreate):
 
 def listar_profesionales(db: Session):
     return db.query(Profesional).all()
+
+
+
+
 
